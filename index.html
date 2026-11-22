@@ -78,7 +78,7 @@ input.price{font-size:30px;font-weight:700;text-align:center}
 .reticle{position:absolute;left:8%;right:8%;top:30%;height:22%;border:3px solid rgba(255,255,255,.9);border-radius:16px;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}
 .reticle::after{content:"";position:absolute;left:6%;right:6%;top:50%;height:2px;background:#ff3b30;box-shadow:0 0 8px #ff3b30}
 .reticle.hit{border-color:#3ddc84}
-.scTop{position:relative;display:flex;justify-content:space-between;align-items:center;padding:calc(var(--st) + 10px) 12px 10px;gap:8px}
+.scTop{position:relative;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:calc(var(--st) + 10px) 12px 10px;gap:8px}
 .scTop .pill{background:rgba(0,0,0,.55);color:#fff;border-radius:999px;padding:10px 16px;font-weight:600;min-height:46px}
 .scMsg{position:absolute;left:0;right:0;top:calc(30% - 52px);text-align:center;color:#fff;font-weight:600;text-shadow:0 1px 3px #000;padding:0 16px}
 .scBot{position:absolute;left:0;right:0;bottom:0;padding:12px 12px calc(14px + var(--sb));background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff}
@@ -136,6 +136,7 @@ small.note{display:block;color:var(--mut);margin-top:8px;font-size:13px}
     <button class="pill" id="scClose">✕ Done</button>
     <button class="pill hidden" id="torchBtn">🔦 Light</button>
     <button class="pill" id="scType">⌨︎ Type code</button>
+    <button class="pill" id="scSnap">📸 Snap tag</button>
   </div>
   <div class="scBot">
     <div class="last hidden" id="lastAdded"></div>
@@ -351,11 +352,66 @@ const Core = (() => {
     const agg = new Map();
     cands.forEach(c => { const e = agg.get(c.cents); if (e) { e.score += c.score; e.votes++; } else agg.set(c.cents, Object.assign({ votes: 1 }, c)); });
     const uniq = [...agg.values()].sort((a,b) => b.score - a.score);
-    // name: top-most text lines that are mostly letters and not price/promo noise
-    const nameLines = [...new Set(lines.map(l => (l.text || '').trim()))].map(t => ({ text: t })).map(l => (l.text || '').replace(/[|_~=*#<>«»{}\[\]]/g,' ').replace(/\s+/g,' ').trim())
-      .filter(s => s.length >= 4 && (s.replace(/[^A-Za-z]/g,'').length / s.length) > 0.6 && !NOISE_RE.test(s) && /[A-Za-z]{3,}/.test(s));
-    const name = nameLines.slice(0, 2).join(' ').replace(/\b([A-Z])([A-Z]+)\b/g, (x,a,b) => a + b.toLowerCase()).slice(0, 80);
-    return { price: uniq.length ? uniq[0].cents : null, alternatives: uniq.slice(1, 4).map(c => c.cents), name: name || '', candidates: uniq };
+    return Object.assign({ price: uniq.length ? uniq[0].cents : null, alternatives: uniq.slice(1, 4).map(c => c.cents), candidates: uniq }, extractTagText(lines));
+  }
+
+  const SIZE_RE = /\b\d+(?:[.,]\d+)?\s*(g|kg|mg|ml|l|cl|oz|pk|pack|packs?|ea|sheets?|litres?|liters?)\b/i;
+  const SIZE_ONLY_RE = /^\d+(?:[.,]\d+)?\s*(g|kg|mg|ml|l|cl|oz|pk|pack|packs?|ea|sheets?|litres?|liters?)$/i;
+  const NAME_NOISE_RE = /\b(was|save|saving|rrp|off|previously|special|offer|dropped|half|member|club|bonus|valid|until|ends?|barcode|sku|unit\s*price|www|http|\.com)\b/i;
+  function cleanTagLine(s){ return String(s||'').replace(/[|_~=*#<>«»{}\[\]]/g,' ').replace(/\s+/g,' ').trim(); }
+  function compactDigits(s){ return String(s||'').replace(/(\d)\s+(?=\d)/g,'$1'); }
+  function extractTagBarcode(lines){
+    const found = [];
+    const consider = s => {
+      const compact = compactDigits(s);
+      const re = /\d{8,13}/g; let m;
+      while ((m = re.exec(compact))) {
+        const d = m[0];
+        const norm = normalize(d) || d;
+        const valid = checksumOk(d) || checksumOk(norm);
+        if (valid) found.push({ code: checksumOk(norm) ? norm : d, len: (checksumOk(norm) ? norm : d).length, valid: true });
+      }
+    };
+    lines.forEach(l => { consider(l.text || ''); (l.words||[]).forEach(w => consider(w.text || '')); });
+    found.sort((a,b) => b.len - a.len);
+    return found.length ? found[0].code : null;
+  }
+  function extractTagName(lines){
+    const seen = new Set(); const rows = [];
+    lines.forEach((l, idx) => {
+      const t = cleanTagLine(l.text || (l.words||[]).map(w => w.text).join(' '));
+      if (!t) return;
+      const key = t.toLowerCase(); if (seen.has(key)) return; seen.add(key);
+      const letters = t.replace(/[^A-Za-z]/g,'').length;
+      rows.push({ text: t, y: l.bbox ? l.bbox.y0 : idx * 10, idx, letters, ratio: letters / t.length });
+    });
+    const isPrice = s => /\$/.test(s) || /\d[.,]\d{2}/.test(s);
+    const isUnit = s => UNIT_RE.test(s);
+    const isPromo = s => NAME_NOISE_RE.test(s) || PENALTY_RE.test(s);
+    const isBarcodeLine = s => { const d = compactDigits(s).replace(/[^\d]/g,''); return /^\d{8,13}$/.test(d) && s.replace(/[\d\s]/g,'').length <= 2; };
+    const cands = rows.filter(r => r.letters >= 3 && /[A-Za-z]{3,}/.test(r.text) && r.ratio >= 0.45
+      && !isPrice(r.text) && !isUnit(r.text) && !isPromo(r.text) && !isBarcodeLine(r.text) && !SIZE_ONLY_RE.test(r.text));
+    cands.sort((a,b) => (b.letters - a.letters) || (a.idx - b.idx) || (a.y - b.y));
+    const chosen = [];
+    cands.forEach(c => {
+      if (chosen.length >= 2) return;
+      const cl = c.text.toLowerCase();
+      if (chosen.some(o => o.text.toLowerCase().includes(cl) || cl.includes(o.text.toLowerCase()))) return;
+      chosen.push(c);
+    });
+    chosen.sort((a,b) => (a.y - b.y) || (a.idx - b.idx));
+    let name = chosen.map(c => c.text).join(' ');
+    if (name && !SIZE_RE.test(name)) {
+      const sizeRow = rows.find(r => SIZE_ONLY_RE.test(r.text) || (SIZE_RE.test(r.text) && !isPrice(r.text) && !isUnit(r.text) && !isPromo(r.text)));
+      if (sizeRow) {
+        const tok = sizeRow.text.match(SIZE_RE);
+        if (tok) name = name + ' ' + tok[0].replace(/\s+/g,'');
+      }
+    }
+    return name.replace(/\b([A-Z])([A-Z]+)\b/g, (x,a,b) => a + b.toLowerCase()).replace(/\s+/g,' ').trim().slice(0, 80);
+  }
+  function extractTagText(lines){
+    return { name: extractTagName(lines) || '', barcode: extractTagBarcode(lines) };
   }
 
   const PRICE_CHECK_SITES = [
@@ -558,11 +614,12 @@ function ocrToLines(data, k=1, lines=[]){
   (data.lines || []).forEach(l => lines.push({ text: l.text, bbox: sb(l.bbox), words: (l.words||[]).map(w => ({ text: w.text, bbox: sb(w.bbox), symbols: (w.symbols||[]).map(s => ({ text: s.text, bbox: sb(s.bbox) })) })) }));
   return { lines };
 }
-// Opens camera, reads the tag; resolves {price, alternatives, name, thumb} or null. Never adds anything by itself.
-async function snapPriceTag(statusEl){
+// Opens camera, reads the tag; resolves {price, alternatives, name, barcode, thumb} or null. Never adds anything by itself.
+// Pass a pre-picked file to skip the camera prompt (so the Tag button can open it in the same tap).
+async function snapPriceTag(statusEl, preFile){
   const hadCam = !!stream; if (hadCam) suspendCamera();
   try {
-    const file = await pickPhoto(); if (!file) return null;
+    const file = preFile !== undefined ? preFile : await pickPhoto(); if (!file) return null;
     const say = h => { if (statusEl) statusEl.innerHTML = h; };
     say('<span class="spin"></span> Reading price tag… (first time downloads the reader, ~10 sec)');
     const big = await prepImage(file, 1600), mid = await prepImage(file, 640), small = await prepImage(file, 400);
@@ -600,12 +657,89 @@ function wireSnap(el, priceSel, nameSel){
     if (r.thumb) { let im = el.querySelector('.snapThumb'); if (!im) { im = document.createElement('img'); im.className = 'snapThumb'; st.after(im); } im.src = r.thumb; }
     if (r.price != null) { pi.value = (r.price/100).toFixed(2); pi.classList.add('flash'); setTimeout(() => pi.classList.remove('flash'), 1200); }
     if (ni && !ni.value.trim() && r.name) ni.value = r.name;
+    const ci = el.querySelector('#mCode'), wrap = el.querySelector('#mCodeWrap');
+    if (ci && r.barcode && !ci.value.trim()) { ci.value = r.barcode; if (wrap) wrap.classList.remove('hidden'); }
     alts.innerHTML = r.alternatives.length ? '<span class="muted">Other prices seen:</span> ' + r.alternatives.map(c => '<button data-c="'+c+'">'+Core.fmt(c)+'</button>').join('') : '';
     alts.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { pi.value = (Number(b.dataset.c)/100).toFixed(2); });
     pi.focus();
   };
 }
 const SNAP_HTML = '<button class="btn full" data-a="snap" style="margin-top:10px">📸 Snap price tag</button><div class="snapStatus muted" style="margin-top:6px"></div><div class="chips snapAlts"></div>';
+
+function submitAddItem(el, storeId, q, close){
+  const nm = el.querySelector('#mName').value.trim(), c = Core.parsePrice(el.querySelector('#mPrice').value);
+  if (!nm) { toast('Enter a name'); return false; }
+  if (c == null) { toast('Enter a price, e.g. 3.99'); return false; }
+  const codeInp = el.querySelector('#mCode');
+  const raw = codeInp ? codeInp.value.replace(/\D/g,'') : '';
+  const code = raw ? (Core.normalize(raw) || raw) : null;
+  const key = code || Core.noBarcodeKey(nm);
+  const save = !el.querySelector('#mSave') || el.querySelector('#mSave').checked;
+  if (save) Core.setPrice(S, storeId, key, nm, c);
+  if (code) S.products[code] = { name: nm, image: null };
+  Core.addToTrolley(S, storeId, { key, barcode: code, name: nm, price: c, qty: q });
+  persist(); render(); toast('Added ' + nm);
+  return true;
+}
+function altPriceChips(r){
+  return r.alternatives && r.alternatives.length ? '<div class="chips snapAlts"><span class="muted">Other prices seen:</span> ' + r.alternatives.map(c => '<button data-c="'+c+'">'+Core.fmt(c)+'</button>').join('')+'</div>' : '<div class="chips snapAlts"></div>';
+}
+function mountSnapConfirm(el, close, storeId, r){
+  const priceVal = r.price != null ? (r.price/100).toFixed(2) : '';
+  const found = (r.name || r.price != null)
+    ? '📸 Found ' + (r.name ? '<b>'+esc(r.name)+'</b>' : 'this item') + (r.price != null ? ' · <b>'+Core.fmt(r.price)+'</b>' : '') + '. Check it matches the tag before adding.'
+    : '📸 Couldn\'t read a name or price from that photo. Type them in, or try again closer and straight-on.';
+  el.innerHTML = '<h2>Add from price tag</h2>'+
+    '<p class="muted">Check this matches the shelf tag, then add it.</p>'+
+    (r.thumb ? '<img class="snapThumb" src="'+esc(r.thumb)+'" alt="Price tag photo">' : '')+
+    '<div class="snapStatus muted">'+found+'</div>'+
+    '<label class="f">Name</label><input class="t" id="mName" placeholder="e.g. Bananas 1kg" value="'+esc(r.name||'')+'" autocomplete="off">'+
+    '<label class="f">Barcode (if on the tag)</label><input class="t" id="mCode" inputmode="numeric" pattern="[0-9]*" placeholder="Optional" value="'+esc(r.barcode||'')+'" autocomplete="off">'+
+    '<label class="f">Shelf price at '+esc((Core.storeById(S,storeId)||{}).name||'this store')+' (GST incl.)</label>'+
+    '<input class="t price" id="mPrice" inputmode="decimal" enterkeyhint="done" placeholder="$0.00" value="'+priceVal+'" autocomplete="off">'+
+    altPriceChips(r)+
+    onlineLinksHtml(storeId, r.name, r.barcode)+
+    '<label class="f">Quantity</label><div class="qty" style="width:max-content"><button data-q="-1">−</button><span id="mQty">1</span><button data-q="1">+</button></div>'+
+    '<label style="display:flex;align-items:center;gap:10px;margin-top:12px;min-height:44px"><input type="checkbox" id="mSave" checked style="width:24px;height:24px"> Remember for this store</label>'+
+    '<div class="acts"><button class="btn" data-a="no">Cancel</button><button class="btn pri" data-a="ok">Add to trolley</button></div>';
+  let q = 1;
+  el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { q = Math.max(1, q + Number(b.dataset.q)); el.querySelector('#mQty').textContent = q; });
+  el.querySelectorAll('.snapAlts [data-c]').forEach(b => b.onclick = () => { el.querySelector('#mPrice').value = (Number(b.dataset.c)/100).toFixed(2); });
+  el.querySelector('[data-a=no]').onclick = close;
+  el.querySelector('[data-a=ok]').onclick = () => { if (submitAddItem(el, storeId, q, close)) close(); };
+  const pi = el.querySelector('#mPrice');
+  if (r.price != null) { pi.classList.add('flash'); setTimeout(() => pi.classList.remove('flash'), 1200); }
+  setTimeout(() => { const ni = el.querySelector('#mName'); if (!ni.value) ni.focus(); else pi.focus(); }, 60);
+}
+function snapNewItem(){
+  // Open the camera in this tap so the browser allows it; then read the tag and show one confirm sheet.
+  if (!cur()) return ensureStore();
+  const photoP = pickPhoto();
+  const resume = !$('#scanner').classList.contains('hidden');
+  if (resume) pauseScan(true);
+  return (async () => {
+    const storeId = cur();
+    try {
+      const file = await photoP;
+      if (!file || !storeId) return;
+      await new Promise(res => {
+        sheet(
+          '<h2>Snap price tag</h2>'+
+          '<div class="snapStatus muted"><span class="spin"></span> Reading price tag…</div>'+
+          '<div class="acts"><button class="btn" data-a="no">Cancel</button></div>',
+          async (el, close, bg) => {
+            const done = () => { bg._onClose = null; close(); res(); };
+            el.querySelector('[data-a=no]').onclick = done;
+            bg._onClose = () => res();
+            const r = await snapPriceTag(el.querySelector('.snapStatus'), file);
+            if (!r || !document.body.contains(bg)) { if (document.body.contains(bg)) done(); else res(); return; }
+            bg._onClose = () => res();
+            mountSnapConfirm(el, done, storeId, r);
+          });
+      });
+    } finally { if (resume) pauseScan(false); }
+  })();
+}
 
 /* ---- handling a scanned code ---- */
 let busy = false;
@@ -645,6 +779,7 @@ async function manualItem(opts){
   const bg = sheet('<h2>Add item without barcode</h2>'+
     (saved.length ? '<div class="muted">Saved items at this store:</div><div class="chips">'+saved.map(([k,v]) => '<button data-k="'+esc(k)+'">'+esc(v.name)+' · '+Core.fmt(v.price)+'</button>').join('')+'</div>' : '')+
     '<label class="f">Name</label><input class="t" id="mName" placeholder="e.g. Bananas 1kg" autocomplete="off">'+
+    '<div id="mCodeWrap" class="hidden"><label class="f">Barcode</label><input class="t" id="mCode" inputmode="numeric" pattern="[0-9]*" placeholder="Optional" autocomplete="off"></div>'+
     '<label class="f">Price (GST incl.)</label><input class="t price" id="mPrice" inputmode="decimal" placeholder="$0.00" autocomplete="off">'+SNAP_HTML+
     '<label class="f">Quantity</label><div class="qty" style="width:max-content"><button data-q="-1">−</button><span id="mQty">1</span><button data-q="1">+</button></div>'+
     '<label style="display:flex;align-items:center;gap:10px;margin-top:12px;min-height:44px"><input type="checkbox" id="mSave" checked style="width:24px;height:24px"> Remember for this store</label>'+
@@ -658,15 +793,7 @@ async function manualItem(opts){
         persist(); render(); close(); toast('Added ' + v.name + ' · ' + Core.fmt(v.price));
       });
       el.querySelector('[data-a=code]').onclick = () => { close(); typeCode(); };
-      el.querySelector('[data-a=ok]').onclick = () => {
-        const nm = el.querySelector('#mName').value.trim(), c = Core.parsePrice(el.querySelector('#mPrice').value);
-        if (!nm) return toast('Enter a name');
-        if (c == null) return toast('Enter a price, e.g. 3.99');
-        const key = Core.noBarcodeKey(nm);
-        if (el.querySelector('#mSave').checked) Core.setPrice(S, storeId, key, nm, c);
-        Core.addToTrolley(S, storeId, { key, name: nm, price: c, qty: q });
-        persist(); render(); close(); toast('Added ' + nm);
-      };
+      el.querySelector('[data-a=ok]').onclick = () => { if (submitAddItem(el, storeId, q, close)) close(); };
       if (opts && opts.snap) setTimeout(() => el.querySelector('[data-a=snap]').click(), 50);
       else setTimeout(() => el.querySelector('#mName').focus(), 60);
     });
@@ -789,7 +916,7 @@ function renderSettings(){
     '<li>Allow camera access when asked. If you said no, re-enable it in your browser\'s site settings.</li>'+
     '<li>Product names come from Open Food Facts. If a product isn\'t found, just type the name once.</li>'+
     '<li>Tap a price in the trolley to fix it if the shelf price has changed.</li>'+
-    '<li>📸 Snap price tag reads the price from a photo of the shelf ticket. Hold the phone straight-on and fill the photo with the ticket, then always check the number before adding.</li></ul></div>';
+    '<li>📸 Snap price tag reads the name, price and any barcode from a photo of the shelf ticket, then asks you to check and add. Hold the phone straight-on and fill the photo with the ticket.</li></ul></div>';
   $('#onlinePriceChk').onchange = e => { S.showOnlinePriceLinks = e.target.checked; persist(); };
   $('#expBtn').onclick = exportBackup;
   $('#impBtn').onclick = () => $('#importFile').click();
@@ -914,9 +1041,10 @@ let torchOn = false;
 $('#torchBtn').onclick = async () => { try { torchOn = !torchOn; await stream.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: torchOn }] }); } catch(e){ toast('Light not supported'); } };
 $('#scanBtn').onclick = openScanner;
 $('#manualBtn').onclick = () => manualItem();
-$('#snapBtn').onclick = () => manualItem({ snap: true });
+$('#snapBtn').onclick = () => snapNewItem();
 $('#scClose').onclick = closeScanner; $('#scDone').onclick = closeScanner;
 $('#scType').onclick = typeCode;
+$('#scSnap').onclick = () => snapNewItem();
 $('#scNoCode').onclick = () => { pauseScan(true); manualItem().then(() => { const w = setInterval(() => { if (!document.querySelector('.sheetBg')) { clearInterval(w); pauseScan(false); } }, 300); }); };
 $('#storeBtn').onclick = () => storePicker();
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0,0); });
