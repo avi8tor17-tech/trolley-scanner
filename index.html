@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Trolley Scanner</title>
+<meta name="theme-color" content="#16803c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Trolley">
+<meta name="description" content="Scan barcodes in store and know your total before the register.">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAACx0lEQVR42u3dUU7DMAyAYTb1DOMy42yMs3EabsEDEprQNkJLE8f+/jfQGI77x/baTj2cLucn4BZHKQA5QA6QA+QAOUAOkAPkADlADoAcIAfIAXKAHCAHyAFygBwgB0AOkAPkADlADpAD5AA5QA6QAyAHyAFygBwgB8gBcoAcIAfIAXIA5EA7y35v/fH6vvEdnt9eHCGV465e2w2DtoKScqgf5AA5xo23UDlADpAD5DB2RGTHM6Qrzm86/CrHf/oEbQXk0HfIAXIYO8gBchg7qrHMGDQ/+vTiY52lwsyhbJADKgfIYewgB6baReQAOfB3DqfLOWxwLSe70k8nD5Kw99qXOvvgOsvfaf365Y8f21927w8b/0Vws4+JN1buskEOqBxV54ngyclQObJ2luHr0lZADj0lnxzGDpXD2BFxRdoKyGHgSClHYy4ydZYga1E5QA49JascPtCqHD7QxlqFtgJyGDgSy1HkA22o+FUOkENPIQeKypF+7IgWeejvraxO36QnzR6vrv+icn5vJd/tHUN0N3MgixwuspADIbYEOUAOVJDD2EEOjN8M5MBdFrsNqSqHY08OkGMHPFaBHCCHsYMcIIexgxyYn8luEyxbHtwJBm0F5AA5ynVicgDzy6F4kAPkWFs81A9y6C9dmfsMKVQOkAPkwCwkf67szcu2oUbXyBGmHUh/vZo//ADEj7Du3edj7wWJH2HCyrEioZ03aPwIDaQoJse6OtyzesePMKccWzLYJ/vxI9RWUEyO7Rtr760ZP0KVA+QAOUAOkAPkADm6sv3qw97XL+JHqHKgpBxbNlafTRk/wsyVY10Ge+Y9foTaCprIeZtg/OcETvEkw5yVoyWnY/MeP8Kn9N94c/c5OaCtgBwgB8gBcoAcIAdADpAD5AA5QA6QA+QAOUAOkAPkAMgBcoAcIAfIAXKAHCAHyAFyAFd8Ai6M15+GS5HxAAAAAElFTkSuQmCC">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAACx0lEQVR42u3dUU7DMAyAYTb1DOMy42yMs3EabsEDEprQNkJLE8f+/jfQGI77x/baTj2cLucn4BZHKQA5QA6QA+QAOUAOkAPkADlADoAcIAfIAXKAHCAHyAFygBwgB0AOkAPkADlADpAD5AA5QA6QAyAHyAFygBwgB8gBcoAcIAfIAXIA5EA7y35v/fH6vvEdnt9eHCGV465e2w2DtoKScqgf5AA5xo23UDlADpAD5DB2RGTHM6Qrzm86/CrHf/oEbQXk0HfIAXIYO8gBchg7qrHMGDQ/+vTiY52lwsyhbJADKgfIYewgB6baReQAOfB3DqfLOWxwLSe70k8nD5Kw99qXOvvgOsvfaf365Y8f21927w8b/0Vws4+JN1buskEOqBxV54ngyclQObJ2luHr0lZADj0lnxzGDpXD2BFxRdoKyGHgSClHYy4ydZYga1E5QA49JascPtCqHD7QxlqFtgJyGDgSy1HkA22o+FUOkENPIQeKypF+7IgWeejvraxO36QnzR6vrv+icn5vJd/tHUN0N3MgixwuspADIbYEOUAOVJDD2EEOjN8M5MBdFrsNqSqHY08OkGMHPFaBHCCHsYMcIIexgxyYn8luEyxbHtwJBm0F5AA5ynVicgDzy6F4kAPkWFs81A9y6C9dmfsMKVQOkAPkwCwkf67szcu2oUbXyBGmHUh/vZo//ADEj7Du3edj7wWJH2HCyrEioZ03aPwIDaQoJse6OtyzesePMKccWzLYJ/vxI9RWUEyO7Rtr760ZP0KVA+QAOUAOkAPkADm6sv3qw97XL+JHqHKgpBxbNlafTRk/wsyVY10Ge+Y9foTaCprIeZtg/OcETvEkw5yVoyWnY/MeP8Kn9N94c/c5OaCtgBwgB8gBcoAcIAdADpAD5AA5QA6QA+QAOUAOkAPkAMgBcoAcIAfIAXKAHCAHyAFyAFd8Ai6M15+GS5HxAAAAAElFTkSuQmCC">
+<link rel="manifest" id="manifestLink">
+<style>
+:root{--g:#16803c;--g2:#0f5f2c;--bg:#f4f6f5;--card:#fff;--tx:#17201b;--mut:#66726b;--bd:#dfe5e1;--red:#c62828;--amb:#b26a00;
+--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:16px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.hidden{display:none!important}
+header{position:sticky;top:0;z-index:5;background:var(--g);color:#fff;padding:calc(var(--st) + 10px) 14px 10px;display:flex;align-items:center;gap:10px}
+header h1{font-size:18px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.storeBtn{background:rgba(255,255,255,.18);color:#fff;border-radius:12px;padding:10px 14px;font-weight:600;min-height:44px;display:flex;align-items:center;gap:6px;max-width:62vw}
+.storeBtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+nav{display:flex;background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:calc(var(--st) + 64px);z-index:4}
+nav button{flex:1;padding:12px 4px;min-height:48px;font-weight:600;color:var(--mut);border-bottom:3px solid transparent}
+nav button.on{color:var(--g);border-bottom-color:var(--g)}
+main{padding:12px 12px calc(170px + var(--sb))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px}
+.empty{text-align:center;color:var(--mut);padding:40px 16px}
+.empty b{display:block;font-size:20px;color:var(--tx);margin-bottom:6px}
+.item{display:flex;gap:10px;align-items:center}
+.item img,.item .ph{width:52px;height:52px;border-radius:10px;object-fit:contain;background:#eef2ef;flex:none;display:flex;align-items:center;justify-content:center;font-size:24px}
+.item .info{flex:1;min-width:0}
+.item .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.item .sub{color:var(--mut);font-size:14px}
+.item .unit{color:var(--g);font-weight:600;text-decoration:underline dotted;padding:4px 0}
+.row2{display:flex;align-items:center;gap:8px;margin-top:8px}
+.qty{display:flex;align-items:center;border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.qty button{width:48px;height:44px;font-size:24px;font-weight:700;color:var(--g)}
+.qty span{min-width:34px;text-align:center;font-weight:700}
+.line{margin-left:auto;font-weight:700;font-size:18px}
+.rm{width:44px;height:44px;border-radius:12px;color:var(--red);font-size:20px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--bd);padding:10px 12px calc(10px + var(--sb));box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.tot{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.tot .lbl{color:var(--mut);font-size:14px}
+.tot .amt{font-size:32px;font-weight:800;letter-spacing:-.5px}
+.tot.over .amt{color:var(--red)}
+.budgetMsg{font-size:14px;font-weight:600;margin:-4px 0 8px}
+.budgetMsg.ok{color:var(--g)}.budgetMsg.warn{color:var(--amb)}.budgetMsg.over{color:var(--red)}
+.btns{display:flex;gap:8px}
+.big{flex:1;min-height:56px;border-radius:14px;font-size:17px;font-weight:700;background:var(--g);color:#fff}
+.big.sec{flex:.55;background:#e8f2ec;color:var(--g2)}
+.btn{min-height:48px;border-radius:12px;padding:10px 16px;font-weight:600;background:#e8f2ec;color:var(--g2)}
+.btn.pri{background:var(--g);color:#fff}.btn.dang{background:#fdecec;color:var(--red)}
+.btn.full{width:100%}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.tools .btn{flex:1}
+label.f{display:block;font-size:14px;color:var(--mut);margin:10px 0 4px}
+input.t,select.t{width:100%;min-height:50px;border:1px solid var(--bd);border-radius:12px;padding:10px 12px;font-size:18px;background:#fff}
+input.price{font-size:30px;font-weight:700;text-align:center}
+.sheetBg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:#fff;width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + var(--sb));max-height:92vh;overflow:auto}
+.sheet h2{margin:0 0 6px;font-size:20px}
+.sheet .acts{display:flex;gap:8px;margin-top:16px}
+.sheet .acts .btn{flex:1;min-height:54px;font-size:17px}
+.prod{display:flex;gap:12px;align-items:center;margin:6px 0}
+.prod img{width:72px;height:72px;object-fit:contain;border-radius:10px;background:#eef2ef}
+.muted{color:var(--mut);font-size:14px}
+.storeList button{display:flex;width:100%;align-items:center;justify-content:space-between;padding:14px 12px;min-height:54px;border-bottom:1px solid var(--bd);font-size:18px;text-align:left}
+.storeList button.on{color:var(--g);font-weight:700}
+.storeList .cnt{font-size:13px;color:var(--mut);font-weight:400}
+#scanner{position:fixed;inset:0;z-index:15;background:#000;display:flex;flex-direction:column}
+#scanner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.reticle{position:absolute;left:8%;right:8%;top:30%;height:22%;border:3px solid rgba(255,255,255,.9);border-radius:16px;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}
+.reticle::after{content:"";position:absolute;left:6%;right:6%;top:50%;height:2px;background:#ff3b30;box-shadow:0 0 8px #ff3b30}
+.reticle.hit{border-color:#3ddc84}
+.scTop{position:relative;display:flex;justify-content:space-between;align-items:center;padding:calc(var(--st) + 10px) 12px 10px;gap:8px}
+.scTop .pill{background:rgba(0,0,0,.55);color:#fff;border-radius:999px;padding:10px 16px;font-weight:600;min-height:46px}
+.scMsg{position:absolute;left:0;right:0;top:calc(30% - 52px);text-align:center;color:#fff;font-weight:600;text-shadow:0 1px 3px #000;padding:0 16px}
+.scBot{position:absolute;left:0;right:0;bottom:0;padding:12px 12px calc(14px + var(--sb));background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff}
+.scBot .tot2{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;font-weight:700}
+.scBot .tot2 b{font-size:28px}
+.scBot .btns .big.sec{background:rgba(255,255,255,.2);color:#fff}
+.last{background:rgba(255,255,255,.95);color:var(--tx);border-radius:12px;padding:10px 12px;margin-bottom:10px;font-size:15px;display:flex;justify-content:space-between;gap:8px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(180px + var(--sb));background:#17201b;color:#fff;padding:12px 18px;border-radius:12px;z-index:40;font-weight:600;max-width:90vw;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.pb .item{padding:4px 0}
+.pb .card{cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chips button{background:#e8f2ec;color:var(--g2);border-radius:999px;padding:8px 12px;font-size:15px;font-weight:600}
+small.note{display:block;color:var(--mut);margin-top:8px;font-size:13px}
+.snapThumb{display:block;max-width:100%;max-height:160px;border-radius:10px;margin-top:8px}
+.flash{animation:fl 1.2s}@keyframes fl{0%{background:#c9f0d6}100%{background:#fff}}
+.big.sec#snapBtn{flex:.5}
+.spin{display:inline-block;width:18px;height:18px;border:3px solid #cfe3d6;border-top-color:var(--g);border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🛒 Trolley</h1>
+  <button class="storeBtn" id="storeBtn" aria-label="Choose store">📍 <span id="storeName">Choose store</span> ▾</button>
+</header>
+<nav>
+  <button data-tab="trolley" class="on">Trolley</button>
+  <button data-tab="prices">Price book</button>
+  <button data-tab="settings">More</button>
+</nav>
+<main>
+  <section id="tab-trolley"></section>
+  <section id="tab-prices" class="hidden"></section>
+  <section id="tab-settings" class="hidden"></section>
+</main>
+<div class="bar" id="bar">
+  <div class="tot" id="totRow"><div><div class="lbl" id="countLbl">0 items</div><div class="lbl">Total (GST incl.)</div></div><div class="amt" id="totAmt">$0.00</div></div>
+  <div class="budgetMsg hidden" id="budgetMsg"></div>
+  <div class="btns">
+    <button class="big" id="scanBtn">📷 Scan</button>
+    <button class="big sec" id="snapBtn" aria-label="Snap price tag">📸 Tag</button>
+    <button class="big sec" id="manualBtn">＋ Add</button>
+  </div>
+</div>
+
+<div id="scanner" class="hidden">
+  <video id="video" playsinline muted autoplay></video>
+  <div class="reticle" id="reticle"></div>
+  <div class="scMsg" id="scMsg">Line up the barcode in the box</div>
+  <div class="scTop">
+    <button class="pill" id="scClose">✕ Done</button>
+    <button class="pill hidden" id="torchBtn">🔦 Light</button>
+    <button class="pill" id="scType">⌨︎ Type code</button>
+  </div>
+  <div class="scBot">
+    <div class="last hidden" id="lastAdded"></div>
+    <div class="tot2"><span id="scCount">0 items</span><b id="scTot">$0.00</b></div>
+    <div class="btns">
+      <button class="big sec" id="scNoCode">No barcode</button>
+      <button class="big" id="scDone">View trolley</button>
+    </div>
+  </div>
+</div>
+
+<div id="sheets"></div>
+<input type="file" id="importFile" accept="application/json,.json" class="hidden">
+
+<script>
+"use strict";
+/* ================= Core logic (pure, testable) ================= */
+const Core = (() => {
+  const KEY = 'trolleyScanner.v1';
+  const DEFAULT_STORES = ['Costco','Coles','Woolworths','Aldi','IGA','Kmart','Big W','Bunnings','Chemist Warehouse']
+    .map(n => ({ id: slug(n), name: n, builtin: true }));
+  function slug(s){ return String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'store'; }
+  function blank(){ return { version:1, customStores:[], lastStore:null, priceBook:{}, trolleys:{}, budgets:{}, products:{} }; }
+
+  // ---- money (stored as integer cents) ----
+  function parsePrice(v){
+    if (typeof v === 'number') return isFinite(v) && v >= 0 ? Math.round(v*100) : null;
+    let s = String(v||'').trim().replace(/[$\sA-Za-z]/g,'');
+    if (/^\d+,\d{1,2}$/.test(s)) s = s.replace(',','.');
+    s = s.replace(/,/g,'');
+    if (!/^\d*\.?\d*$/.test(s) || s === '' || s === '.') return null;
+    const n = parseFloat(s);
+    return isFinite(n) && n >= 0 ? Math.round(n*100) : null;
+  }
+  function fmt(c){
+    const neg = c < 0; c = Math.abs(Math.round(c||0));
+    const d = Math.floor(c/100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return (neg?'-':'') + '$' + d + '.' + String(c%100).padStart(2,'0');
+  }
+
+  // ---- barcodes ----
+  function checksumOk(code){
+    if (!/^\d+$/.test(code) || ![8,12,13,14].includes(code.length)) return false;
+    const digits = code.split('').map(Number); const check = digits.pop();
+    let sum = 0; digits.reverse().forEach((d,i) => { sum += d * (i % 2 === 0 ? 3 : 1); });
+    return (10 - (sum % 10)) % 10 === check;
+  }
+  function expandUPCE(e){ // 8-digit UPC-E -> 12-digit UPC-A
+    if (!/^[01]\d{7}$/.test(e)) return null;
+    const ns = e[0], d = e.slice(1,7), ck = e[7]; let m;
+    const last = d[5];
+    if ('012'.includes(last)) m = d.slice(0,2) + last + '0000' + d.slice(2,5);
+    else if (last === '3') m = d.slice(0,3) + '00000' + d.slice(3,5);
+    else if (last === '4') m = d.slice(0,4) + '00000' + d[4];
+    else m = d.slice(0,5) + '0000' + last;
+    return ns + m + ck;
+  }
+  // Normalise to a canonical key: UPC-A(12) -> EAN-13 with leading 0; UPC-E -> EAN-13.
+  function normalize(raw, format){
+    let c = String(raw||'').replace(/\D/g,'');
+    if (!c) return null;
+    if (format === 'upc_e' || (c.length === 8 && format !== 'ean_8' && !checksumOk(c) && expandUPCE(c))) {
+      const a = expandUPCE(c); if (a) c = a;
+    } else if (c.length === 6 || c.length === 7) {
+      const a = expandUPCE(c.length === 6 ? '0' + c + upceCheck('0'+c) : c + upceCheck(c));
+      if (a) c = a;
+    }
+    if (c.length === 12) c = '0' + c;
+    if (c.length === 14 && c[0] === '0') c = c.slice(1);
+    return c;
+  }
+  function upceCheck(seven){ const a = expandUPCE(seven + '0'); if(!a) return '0';
+    const body = a.slice(0,11).split('').map(Number); let s=0; body.forEach((d,i)=>{ s += d*(i%2===0?3:1); }); return String((10-(s%10))%10); }
+  function isValidScan(code){ return checksumOk(code); }
+
+  // ---- state ----
+  function load(storage){
+    try { const s = JSON.parse(storage.getItem(KEY)); if (s && s.version === 1) return Object.assign(blank(), s); } catch(e){}
+    return blank();
+  }
+  function save(storage, state){ storage.setItem(KEY, JSON.stringify(state)); }
+  function stores(state){ return DEFAULT_STORES.concat(state.customStores); }
+  function storeById(state, id){ return stores(state).find(s => s.id === id) || null; }
+  function addStore(state, name){
+    name = String(name||'').trim(); if (!name) return null;
+    const existing = stores(state).find(s => s.name.toLowerCase() === name.toLowerCase());
+    if (existing) return existing;
+    let id = slug(name), n = 2; while (storeById(state, id)) id = slug(name) + '-' + (n++);
+    const st = { id, name, builtin:false }; state.customStores.push(st); return st;
+  }
+  function removeStore(state, id){
+    state.customStores = state.customStores.filter(s => s.id !== id);
+    delete state.priceBook[id]; delete state.trolleys[id]; delete state.budgets[id];
+    if (state.lastStore === id) state.lastStore = null;
+  }
+  function book(state, storeId){ return state.priceBook[storeId] || (state.priceBook[storeId] = {}); }
+  function trolley(state, storeId){ return state.trolleys[storeId] || (state.trolleys[storeId] = []); }
+  function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function noBarcodeKey(name){ return 'nb:' + String(name).toLowerCase().trim().replace(/\s+/g,' '); }
+
+  function getPrice(state, storeId, key){ return (state.priceBook[storeId]||{})[key] || null; }
+  function setPrice(state, storeId, key, name, cents, image){
+    const b = book(state, storeId);
+    b[key] = { name: name || (b[key] && b[key].name) || key, price: cents, updated: today(), image: image || (b[key] && b[key].image) || null };
+    return b[key];
+  }
+  function deletePrice(state, storeId, key){ const b = book(state, storeId); delete b[key]; }
+
+  function addToTrolley(state, storeId, {key, barcode=null, name, price, image=null, qty=1}){
+    const t = trolley(state, storeId);
+    const ex = t.find(i => i.key === key);
+    if (ex) { ex.qty += qty; ex.price = price; if (name) ex.name = name; return ex; }
+    const it = { id: Date.now().toString(36) + Math.random().toString(36).slice(2,6), key, barcode, name, price, image, qty };
+    t.unshift(it); return it;
+  }
+  function setQty(state, storeId, id, qty){
+    const t = trolley(state, storeId); const it = t.find(i => i.id === id); if (!it) return;
+    if (qty <= 0) state.trolleys[storeId] = t.filter(i => i.id !== id); else it.qty = qty;
+  }
+  function removeItem(state, storeId, id){ state.trolleys[storeId] = trolley(state, storeId).filter(i => i.id !== id); }
+  function clearTrolley(state, storeId){ state.trolleys[storeId] = []; }
+  function totals(state, storeId){
+    const t = state.trolleys[storeId] || [];
+    return { total: t.reduce((s,i) => s + i.price * i.qty, 0), count: t.reduce((s,i) => s + i.qty, 0), lines: t.length };
+  }
+  function budgetStatus(state, storeId){
+    const b = state.budgets[storeId]; if (!b) return null;
+    const { total } = totals(state, storeId);
+    return { budget: b, total, left: b - total, level: total > b ? 'over' : total >= b * 0.9 ? 'warn' : 'ok' };
+  }
+
+  // ---- import / export ----
+  function exportData(state){ return JSON.stringify({ app:'trolley-scanner', exported: new Date().toISOString(), data: state }, null, 2); }
+  function importData(state, text, mode){
+    const obj = JSON.parse(text); const d = obj && obj.data ? obj.data : obj;
+    if (!d || typeof d !== 'object' || !d.priceBook) throw new Error('Not a Trolley Scanner backup file');
+    if (mode === 'replace') { const n = Object.assign(blank(), d); Object.keys(state).forEach(k => delete state[k]); Object.assign(state, n); return state; }
+    (d.customStores||[]).forEach(s => { if (!storeById(state, s.id)) state.customStores.push(s); });
+    for (const [sid, entries] of Object.entries(d.priceBook||{})) {
+      const b = book(state, sid);
+      for (const [k, v] of Object.entries(entries)) { if (!b[k] || (v.updated||'') >= (b[k].updated||'')) b[k] = v; }
+    }
+    Object.assign(state.products, d.products||{});
+    for (const [sid, v] of Object.entries(d.budgets||{})) if (!state.budgets[sid]) state.budgets[sid] = v;
+    return state;
+  }
+
+  // ---- price tag OCR parsing ----
+  // data: { lines:[{ text, words:[{ text, bbox:{x0,y0,x1,y1}, symbols:[{text,bbox}] }] }] }
+  const UNIT_RE = /(per\s*(100|10|1)?\s*(g|kg|ml|l|m|ea|each|sheets?|pk|pack|metre|litre)\b)|(\/\s*(100|10|1)?\s*(g|kg|ml|l|m|ea)\b)|(\b(100|10)\s?(g|ml)\b)|\bunit\s*price\b|\bper\b/i;
+  const PENALTY_RE = /\b(was|save|saving|rrp|off|previously|from)\b/i;
+  const NOISE_RE = /(\$|\d[.,]\d{2}|\b\d{3,}\b|\bper\b|\bunit\b|\bprice\b|\bsave\b|\bwas\b|\bspecial\b|\bdown\b|\beach\b|\bea\b|\boffer\b|\bdropped\b|\blow\b|\bmember|\bbarcode|\bcode\b|\bsku\b|\bvalid\b|\buntil\b|\bends?\b|\bwww\b|\bcom\b|\bkg\b|\bitem\b|\bhalf\b|\bonly\b|\bnew\b)/i;
+  function h(b){ return b ? Math.max(1, b.y1 - b.y0) : 1; }
+  function parsePriceTag(data){
+    const lines = (data && data.lines) || [];
+    const cands = [];
+    const push = (cents, height, lineText, mult, how) => {
+      if (cents == null || cents <= 0 || cents > 500000) return;
+      let m = mult;
+      if (UNIT_RE.test(lineText)) m *= 0.3;
+      if (PENALTY_RE.test(lineText)) m *= 0.4;
+      if (/\$/.test(lineText)) m *= 1.2;
+      if (/\b(ea|each)\b/i.test(lineText) && !UNIT_RE.test(lineText)) m *= 1.1;
+      cands.push({ cents, score: height * m, how, line: lineText.trim() });
+    };
+    const all = [];
+    lines.forEach(line => (line.words||[]).forEach(w => all.push(w)));
+    const digitsOf = w => String(w.text||'').replace(/[^\d]/g,'');
+    const centsPartner = (w, hw) => all.find(o => o !== w && /^\d{2}$/.test(digitsOf(o)) && String(o.text).replace(/[^\d]/g,'').length === 2 && o.bbox && w.bbox &&
+      h(o.bbox) < hw * 0.85 && o.bbox.x0 >= w.bbox.x0 + (w.bbox.x1 - w.bbox.x0) * 0.35 && o.bbox.x0 <= w.bbox.x1 + hw * 0.7 &&
+      o.bbox.y0 >= w.bbox.y0 - hw * 0.25 && o.bbox.y0 <= w.bbox.y0 + hw * 0.5);
+    const isCentsOfOther = (w, hw) => all.some(o => o !== w && /^\$?\d{1,4}$/.test(String(o.text)) && o.bbox && w.bbox && hw < h(o.bbox) * 0.85 &&
+      w.bbox.x0 >= o.bbox.x1 - h(o.bbox) * 0.15 && w.bbox.x0 <= o.bbox.x1 + h(o.bbox) * 0.7 && w.bbox.y0 >= o.bbox.y0 - h(o.bbox) * 0.25 && w.bbox.y0 <= o.bbox.y0 + h(o.bbox) * 0.5);
+    lines.forEach(line => {
+      const lt = line.text || (line.words||[]).map(w => w.text).join(' ');
+      const words = line.words || [];
+      words.forEach((w, i) => {
+        const raw = String(w.text||'').replace(/(\d)[Oo]/g, '$10').replace(/[Oo](\d)/g, '0$1').replace(/[Ss](?=\d{2}\b)/g,'$');
+        const hw = h(w.bbox);
+        // 1) explicit decimal: $4.50 / 4,50 / 4.50ea
+        let m = raw.match(/\$?(\d{1,4})[.,·](\d{2})(?!\d)/);
+        if (m) { push(Number(m[1])*100 + Number(m[2]), hw, lt, 1, 'decimal'); return; }
+        m = raw.replace(/[.,:;'"!|]+$/, '').match(/^\$?(\d{1,4})$|^\$?(\d{1,4})(ea|each|kg)$/i);
+        if (!m) return;
+        const digits = m[1] || m[2];
+        // 2) superscript cents inside one word (symbols of differing height)
+        const sy = (w.symbols||[]).filter(s => /\d/.test(s.text) && s.bbox);
+        if (sy.length >= 2) {
+          const maxH = Math.max(...sy.map(s => h(s.bbox)));
+          let k = 0; while (k < sy.length && h(sy[k].bbox) >= maxH * 0.72) k++;
+          const tail = sy.slice(k);
+          if (k >= 1 && tail.length >= 1 && tail.length <= 2 && tail.every(s => h(s.bbox) < maxH * 0.72)) {
+            const dollars = Number(sy.slice(0, k).map(s => s.text).join('')), c = tail.map(s => s.text).join('');
+            push(dollars*100 + (c.length === 2 ? Number(c) : Number(c)*10), maxH, lt, c.length === 2 ? 1.05 : 0.7, 'superscript'); return;
+          }
+        }
+        // 3) big dollars word followed by a smaller 2-digit cents word: "$4" "50"
+        const nx = digits.length <= 3 ? centsPartner(w, hw) : null;
+        if (nx) {
+          // if the big word swallowed a misread of the cents (e.g. "$42." for "$4⁵⁰"), drop its last digit
+          const overl = nx.bbox.x0 < w.bbox.x1 - hw * 0.1 && digits.length >= 2;
+          push(Number(overl ? digits.slice(0, -1) : digits)*100 + Number(digitsOf(nx)), hw, lt, 1.05, 'split'); return;
+        }
+        // skip if this word is itself the superscript cents of a bigger dollars word
+        if (/^\d{2}$/.test(digits) && isCentsOfOther(w, hw)) return;
+        // 4) "$450" or large "450" with no separator: most likely superscript cents got merged
+        if (digits.length >= 3 && (raw.startsWith('$') || hw > 0)) {
+          push(Number(digits.slice(0,-2))*100 + Number(digits.slice(-2)), hw, lt, raw.startsWith('$') ? 0.9 : 0.6, 'merged');
+          if (raw.startsWith('$')) push(Number(digits)*100, hw, lt, 0.35, 'whole');
+        } else if (raw.startsWith('$')) push(Number(digits)*100, hw, lt, 0.9, 'whole-dollars');
+      });
+    });
+    const agg = new Map();
+    cands.forEach(c => { const e = agg.get(c.cents); if (e) { e.score += c.score; e.votes++; } else agg.set(c.cents, Object.assign({ votes: 1 }, c)); });
+    const uniq = [...agg.values()].sort((a,b) => b.score - a.score);
+    // name: top-most text lines that are mostly letters and not price/promo noise
+    const nameLines = [...new Set(lines.map(l => (l.text || '').trim()))].map(t => ({ text: t })).map(l => (l.text || '').replace(/[|_~=*#<>«»{}\[\]]/g,' ').replace(/\s+/g,' ').trim())
+      .filter(s => s.length >= 4 && (s.replace(/[^A-Za-z]/g,'').length / s.length) > 0.6 && !NOISE_RE.test(s) && /[A-Za-z]{3,}/.test(s));
+    const name = nameLines.slice(0, 2).join(' ').replace(/\b([A-Z])([A-Z]+)\b/g, (x,a,b) => a + b.toLowerCase()).slice(0, 80);
+    return { price: uniq.length ? uniq[0].cents : null, alternatives: uniq.slice(1, 4).map(c => c.cents), name: name || '', candidates: uniq };
+  }
+
+  return { parsePriceTag, KEY, DEFAULT_STORES, slug, blank, parsePrice, fmt, checksumOk, expandUPCE, normalize, isValidScan,
+    load, save, stores, storeById, addStore, removeStore, book, trolley, getPrice, setPrice, deletePrice, noBarcodeKey,
+    addToTrolley, setQty, removeItem, clearTrolley, totals, budgetStatus, exportData, importData, today };
+})();
+
+/* ================= Product lookup ================= */
+const Lookup = (() => {
+  const SOURCES = [
+    'https://world.openfoodfacts.org/api/v2/product/',
+    'https://world.openproductsfacts.org/api/v2/product/',
+    'https://world.openbeautyfacts.org/api/v2/product/'
+  ];
+  const FIELDS = '?fields=product_name,product_name_en,generic_name,brands,quantity,image_front_small_url,image_small_url,image_url';
+  async function one(base, code){
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 7000);
+    try {
+      const r = await fetch(base + encodeURIComponent(code) + '.json' + FIELDS, { signal: ctl.signal });
+      if (!r.ok) return null;
+      const j = await r.json(); if (j.status !== 1 || !j.product) return null;
+      const p = j.product; const nm = (p.product_name_en || p.product_name || p.generic_name || '').trim();
+      if (!nm) return null;
+      const brand = (p.brands || '').split(',')[0].trim();
+      let name = nm;
+      if (brand && !nm.toLowerCase().includes(brand.toLowerCase())) name = brand + ' ' + nm;
+      const qty = String(p.quantity || '').replace(/\s*[e℮]\s*$/i, '').trim();
+      if (qty && !name.toLowerCase().includes(qty.toLowerCase())) name += ' ' + qty;
+      return { name, image: p.image_front_small_url || p.image_small_url || p.image_url || null };
+    } catch(e) { return null; } finally { clearTimeout(tm); }
+  }
+  async function find(code){
+    const tries = [code]; if (code.length === 13 && code[0] === '0') tries.push(code.slice(1));
+    for (const base of SOURCES) for (const c of tries) { const r = await one(base, c); if (r) return r; }
+    return null;
+  }
+  return { find };
+})();
+
+/* ================= UI ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S = Core.load(localStorage);
+let tab = 'trolley';
+let pbStore = null, pbQuery = '';
+function persist(){ try { Core.save(localStorage, S); } catch(e){ toast('Could not save — storage full?'); } }
+function cur(){ return S.lastStore && Core.storeById(S, S.lastStore) ? S.lastStore : null; }
+
+function toast(msg, ms=2200){
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), ms);
+}
+let audioCtx = null;
+function unlockAudio(){ try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch(e){} }
+function beep(ok=true){
+  try { if (navigator.vibrate) navigator.vibrate(ok ? 80 : [60,40,60]); } catch(e){}
+  try { unlockAudio(); if (!audioCtx) return; const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'square'; o.frequency.value = ok ? 1800 : 400; g.gain.value = 0.08; o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + (ok ? 0.09 : 0.2)); } catch(e){}
+}
+
+/* ---- sheets (modals) ---- */
+function sheet(html, onMount){
+  const bg = document.createElement('div'); bg.className = 'sheetBg';
+  bg.innerHTML = '<div class="sheet" role="dialog">' + html + '</div>';
+  bg.addEventListener('click', e => { if (e.target === bg) close(); });
+  $('#sheets').appendChild(bg);
+  function close(){ bg.remove(); if (bg._onClose) bg._onClose(); }
+  bg.close = close;
+  if (onMount) onMount(bg.querySelector('.sheet'), close, bg);
+  return bg;
+}
+function confirmSheet(title, msg, okLabel, danger){
+  return new Promise(res => {
+    const bg = sheet('<h2>'+esc(title)+'</h2><p class="muted">'+esc(msg)+'</p><div class="acts"><button class="btn" data-a="no">Cancel</button><button class="btn '+(danger?'dang':'pri')+'" data-a="yes">'+esc(okLabel)+'</button></div>',
+      (el, close) => { el.querySelector('[data-a=no]').onclick = () => { close(); }; el.querySelector('[data-a=yes]').onclick = () => { bg._onClose = null; close(); res(true); }; });
+    bg._onClose = () => res(false);
+  });
+}
+
+/* ---- store picker ---- */
+function storePicker(force){
+  return new Promise(res => {
+    const list = Core.stores(S).map(s => {
+      const n = (S.trolleys[s.id]||[]).length, p = Object.keys(S.priceBook[s.id]||{}).length;
+      return '<button data-id="'+esc(s.id)+'" class="'+(s.id===S.lastStore?'on':'')+'"><span>'+esc(s.name)+'</span><span class="cnt">'+(p?p+' prices':'')+(n?' · '+n+' in trolley':'')+'</span></button>';
+    }).join('');
+    const bg = sheet('<h2>Which store are you in?</h2><div class="storeList">'+list+'</div>'+
+      '<label class="f">Add custom store</label><div style="display:flex;gap:8px"><input class="t" id="newStore" placeholder="e.g. Sale Fresh Market" autocomplete="off"><button class="btn pri" id="addStoreBtn">Add</button></div>'+
+      (force?'':'<div class="acts"><button class="btn" data-a="close">Close</button></div>'),
+      (el, close) => {
+        el.querySelectorAll('.storeList button').forEach(b => b.onclick = () => { S.lastStore = b.dataset.id; persist(); bg._onClose = null; close(); render(); res(b.dataset.id); });
+        el.querySelector('#addStoreBtn').onclick = () => {
+          const st = Core.addStore(S, el.querySelector('#newStore').value);
+          if (!st) return toast('Type a store name first');
+          S.lastStore = st.id; persist(); bg._onClose = null; close(); render(); toast('Added ' + st.name); res(st.id);
+        };
+        const c = el.querySelector('[data-a=close]'); if (c) c.onclick = close;
+      });
+    bg._onClose = () => res(null);
+  });
+}
+async function ensureStore(){ return cur() || await storePicker(true); }
+
+/* ---- price prompt ---- */
+function priceSheet({title, name, image, barcode, price, askName, saveDefault=true, showSave=false, qtyField=false}){
+  return new Promise(res => {
+    const bg = sheet(
+      '<h2>'+esc(title)+'</h2>'+
+      '<div class="prod">'+(image?'<img src="'+esc(image)+'" alt="">':'')+'<div style="flex:1;min-width:0">'+
+        (askName ? '<input class="t" id="pName" placeholder="Product name" value="'+esc(name||'')+'" autocomplete="off">' : '<div style="font-weight:700">'+esc(name)+'</div>')+
+        (barcode ? '<div class="muted">Barcode '+esc(barcode)+'</div>' : '')+'</div></div>'+
+      (askName && name ? '' : '')+
+      '<label class="f">Shelf price at '+esc((Core.storeById(S,cur())||{}).name||'this store')+' (GST incl.)</label>'+
+      '<input class="t price" id="pPrice" inputmode="decimal" enterkeyhint="done" placeholder="$0.00" value="'+(price!=null?(price/100).toFixed(2):'')+'" autocomplete="off">'+SNAP_HTML+
+      (qtyField ? '<label class="f">Quantity</label><div class="qty" style="width:max-content"><button data-q="-1">−</button><span id="pQty">1</span><button data-q="1">+</button></div>' : '')+
+      (showSave ? '<label style="display:flex;align-items:center;gap:10px;margin-top:12px;min-height:44px"><input type="checkbox" id="pSave" '+(saveDefault?'checked':'')+' style="width:24px;height:24px"> Remember this price for next time</label>' : '')+
+      '<div class="acts"><button class="btn" data-a="no">Cancel</button><button class="btn pri" data-a="ok">'+(qtyField||title.startsWith('New')?'Add to trolley':'Save')+'</button></div>',
+      (el, close) => {
+        const pi = el.querySelector('#pPrice'), ni = el.querySelector('#pName');
+        wireSnap(el, '#pPrice', '#pName');
+        let q = 1;
+        el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { q = Math.max(1, q + Number(b.dataset.q)); el.querySelector('#pQty').textContent = q; });
+        const ok = () => {
+          const c = Core.parsePrice(pi.value);
+          const nm = ni ? ni.value.trim() : name;
+          if (ni && !nm) { ni.focus(); return toast('Enter a product name'); }
+          if (c == null) { pi.focus(); return toast('Enter a price, e.g. 4.50'); }
+          bg._onClose = null; close();
+          res({ price: c, name: nm, qty: q, save: showSave ? el.querySelector('#pSave').checked : true });
+        };
+        el.querySelector('[data-a=ok]').onclick = ok;
+        el.querySelector('[data-a=no]').onclick = close;
+        pi.addEventListener('keydown', e => { if (e.key === 'Enter') ok(); });
+        setTimeout(() => { (ni && !ni.value ? ni : pi).focus(); pi.select && pi.select(); }, 60);
+      });
+    bg._onClose = () => res(null);
+  });
+}
+
+/* ---- price tag photo + OCR ---- */
+let ocrWorkerP = null;
+function loadScript(src){ return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('load failed')); document.head.appendChild(s); }); }
+async function getOcr(progress){
+  if (!ocrWorkerP) ocrWorkerP = (async () => {
+    if (!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+    const w = await Tesseract.createWorker('eng', 1, { logger: m => { if (ocrProgress && m.progress != null && /load|init/i.test(m.status)) ocrProgress(m.status, m.progress); } });
+    return w;
+  })().catch(e => { ocrWorkerP = null; throw e; });
+  ocrProgress = progress; return ocrWorkerP;
+}
+let ocrProgress = null;
+function pickPhoto(){
+  return new Promise(res => {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.setAttribute('capture', 'environment');
+    inp.style.display = 'none'; document.body.appendChild(inp);
+    let done = false;
+    inp.onchange = () => { done = true; const f = inp.files && inp.files[0]; inp.remove(); res(f || null); };
+    window.addEventListener('focus', function f(){ window.removeEventListener('focus', f); setTimeout(() => { if (!done) { inp.remove(); res(null); } }, 1500); });
+    inp.click();
+  });
+}
+async function prepImage(file, max=1600){
+  const url = URL.createObjectURL(file);
+  const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+  const sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+  const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * sc); c.height = Math.round(img.naturalHeight * sc);
+  const g = c.getContext('2d'); g.drawImage(img, 0, 0, c.width, c.height);
+  const d = g.getImageData(0, 0, c.width, c.height), p = d.data;
+  for (let i = 0; i < p.length; i += 4) { let y = 0.299*p[i] + 0.587*p[i+1] + 0.114*p[i+2]; y = Math.max(0, Math.min(255, (y - 128) * 1.4 + 128)); p[i] = p[i+1] = p[i+2] = y; }
+  g.putImageData(d, 0, 0);
+  URL.revokeObjectURL(url);
+  return { canvas: c, thumb: c.toDataURL('image/jpeg', 0.6), scale: sc };
+}
+function ocrToLines(data, k=1, lines=[]){
+  const sb = b => b && ({ x0: b.x0*k, y0: b.y0*k, x1: b.x1*k, y1: b.y1*k });
+  (data.lines || []).forEach(l => lines.push({ text: l.text, bbox: sb(l.bbox), words: (l.words||[]).map(w => ({ text: w.text, bbox: sb(w.bbox), symbols: (w.symbols||[]).map(s => ({ text: s.text, bbox: sb(s.bbox) })) })) }));
+  return { lines };
+}
+// Opens camera, reads the tag; resolves {price, alternatives, name, thumb} or null. Never adds anything by itself.
+async function snapPriceTag(statusEl){
+  const hadCam = !!stream; if (hadCam) suspendCamera();
+  try {
+    const file = await pickPhoto(); if (!file) return null;
+    const say = h => { if (statusEl) statusEl.innerHTML = h; };
+    say('<span class="spin"></span> Reading price tag… (first time downloads the reader, ~10 sec)');
+    const big = await prepImage(file, 1600), mid = await prepImage(file, 640), small = await prepImage(file, 400);
+    const w = await getOcr((st, pr) => say('<span class="spin"></span> Reading price tag… ' + Math.round(pr*100) + '%'));
+    // several passes: full size (sparse text) catches small print and the name; smaller copies
+    // read as a block catch the big price digits, which the reader often misses at full size.
+    const passes = [[big, '11'], [mid, '6'], [small, '6']];
+    let lines = [], texts = [];
+    for (let i = 0; i < passes.length; i++) {
+      const [img, psm] = passes[i];
+      say('<span class="spin"></span> Reading price tag… step ' + (i+1) + ' of ' + passes.length);
+      await w.setParameters({ tessedit_pageseg_mode: psm });
+      const d = (await w.recognize(img.canvas)).data;
+      ocrToLines(d, big.scale / img.scale, lines); texts.push(d.text);
+    }
+    const r = Core.parsePriceTag({ lines });
+    const thumb = big.thumb, data = { text: texts.join('\n---\n') };
+    r.thumb = thumb; r.text = data.text; window.TrolleyApp.lastOcr = r;
+    say(r.price != null ? '📸 Found <b>' + Core.fmt(r.price) + '</b>. Check it matches the tag before adding.' : '📸 Couldn\'t read a price from that photo. Type it in, or try again closer and straight-on.');
+    return r;
+  } catch(e) {
+    if (statusEl) statusEl.innerHTML = '📸 Price tag reader unavailable (' + esc(e.message || e) + '). Type the price instead.';
+    return null;
+  } finally { if (hadCam) resumeCamera(); }
+}
+function wireSnap(el, priceSel, nameSel){
+  const btn = el.querySelector('[data-a=snap]'), st = el.querySelector('.snapStatus'), alts = el.querySelector('.snapAlts');
+  if (!btn) return;
+  btn.onclick = async () => {
+    btn.disabled = true;
+    const r = await snapPriceTag(st);
+    btn.disabled = false;
+    if (!r) return;
+    const pi = el.querySelector(priceSel), ni = nameSel && el.querySelector(nameSel);
+    if (r.thumb) { let im = el.querySelector('.snapThumb'); if (!im) { im = document.createElement('img'); im.className = 'snapThumb'; st.after(im); } im.src = r.thumb; }
+    if (r.price != null) { pi.value = (r.price/100).toFixed(2); pi.classList.add('flash'); setTimeout(() => pi.classList.remove('flash'), 1200); }
+    if (ni && !ni.value.trim() && r.name) ni.value = r.name;
+    alts.innerHTML = r.alternatives.length ? '<span class="muted">Other prices seen:</span> ' + r.alternatives.map(c => '<button data-c="'+c+'">'+Core.fmt(c)+'</button>').join('') : '';
+    alts.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { pi.value = (Number(b.dataset.c)/100).toFixed(2); });
+    pi.focus();
+  };
+}
+const SNAP_HTML = '<button class="btn full" data-a="snap" style="margin-top:10px">📸 Snap price tag</button><div class="snapStatus muted" style="margin-top:6px"></div><div class="chips snapAlts"></div>';
+
+/* ---- handling a scanned code ---- */
+let busy = false;
+async function handleCode(raw, format){
+  const storeId = await ensureStore(); if (!storeId) return;
+  const code = Core.normalize(raw, format);
+  if (!code) return;
+  busy = true;
+  try {
+    const known = Core.getPrice(S, storeId, code);
+    if (known) {
+      const it = Core.addToTrolley(S, storeId, { key: code, barcode: code, name: known.name, price: known.price, image: known.image });
+      persist(); render(); showLast(it, true);
+      return;
+    }
+    let info = S.products[code];
+    if (!info) {
+      setScanMsg('<span class="spin"></span> Looking up ' + code + '…');
+      const lu = await Lookup.find(code);
+      if (lu) { info = lu; S.products[code] = lu; persist(); }
+    }
+    setScanMsg('Line up the barcode in the box');
+    // known at another store? offer its name
+    if (!info) { for (const sid in S.priceBook) { const e = S.priceBook[sid][code]; if (e) { info = { name: e.name, image: e.image }; break; } } }
+    const r = await priceSheet({ title: 'New item', name: info ? info.name : '', image: info && info.image, barcode: code, askName: true, qtyField: true });
+    if (!r) return;
+    S.products[code] = { name: r.name, image: info && info.image || null };
+    Core.setPrice(S, storeId, code, r.name, r.price, info && info.image);
+    const it = Core.addToTrolley(S, storeId, { key: code, barcode: code, name: r.name, price: r.price, image: info && info.image, qty: r.qty });
+    persist(); render(); showLast(it, false);
+  } finally { busy = false; }
+}
+
+async function manualItem(opts){
+  const storeId = await ensureStore(); if (!storeId) return;
+  const saved = Object.entries(S.priceBook[storeId]||{}).filter(([k]) => k.startsWith('nb:'));
+  const bg = sheet('<h2>Add item without barcode</h2>'+
+    (saved.length ? '<div class="muted">Saved items at this store:</div><div class="chips">'+saved.map(([k,v]) => '<button data-k="'+esc(k)+'">'+esc(v.name)+' · '+Core.fmt(v.price)+'</button>').join('')+'</div>' : '')+
+    '<label class="f">Name</label><input class="t" id="mName" placeholder="e.g. Bananas 1kg" autocomplete="off">'+
+    '<label class="f">Price (GST incl.)</label><input class="t price" id="mPrice" inputmode="decimal" placeholder="$0.00" autocomplete="off">'+SNAP_HTML+
+    '<label class="f">Quantity</label><div class="qty" style="width:max-content"><button data-q="-1">−</button><span id="mQty">1</span><button data-q="1">+</button></div>'+
+    '<label style="display:flex;align-items:center;gap:10px;margin-top:12px;min-height:44px"><input type="checkbox" id="mSave" checked style="width:24px;height:24px"> Remember for this store</label>'+
+    '<div class="acts"><button class="btn" data-a="code">Type barcode</button><button class="btn pri" data-a="ok">Add to trolley</button></div>',
+    (el, close) => {
+      let q = 1; wireSnap(el, '#mPrice', '#mName');
+      el.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { q = Math.max(1, q + Number(b.dataset.q)); el.querySelector('#mQty').textContent = q; });
+      el.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+        const v = S.priceBook[storeId][b.dataset.k];
+        const it = Core.addToTrolley(S, storeId, { key: b.dataset.k, name: v.name, price: v.price });
+        persist(); render(); close(); toast('Added ' + v.name + ' · ' + Core.fmt(v.price));
+      });
+      el.querySelector('[data-a=code]').onclick = () => { close(); typeCode(); };
+      el.querySelector('[data-a=ok]').onclick = () => {
+        const nm = el.querySelector('#mName').value.trim(), c = Core.parsePrice(el.querySelector('#mPrice').value);
+        if (!nm) return toast('Enter a name');
+        if (c == null) return toast('Enter a price, e.g. 3.99');
+        const key = Core.noBarcodeKey(nm);
+        if (el.querySelector('#mSave').checked) Core.setPrice(S, storeId, key, nm, c);
+        Core.addToTrolley(S, storeId, { key, name: nm, price: c, qty: q });
+        persist(); render(); close(); toast('Added ' + nm);
+      };
+      if (opts && opts.snap) setTimeout(() => el.querySelector('[data-a=snap]').click(), 50);
+      else setTimeout(() => el.querySelector('#mName').focus(), 60);
+    });
+}
+
+function typeCode(){
+  pauseScan(true);
+  const bg = sheet('<h2>Type the barcode</h2><p class="muted">The numbers under the barcode.</p><input class="t price" id="tCode" inputmode="numeric" pattern="[0-9]*" placeholder="9300000000000" autocomplete="off">'+
+    '<div class="acts"><button class="btn" data-a="no">Cancel</button><button class="btn pri" data-a="ok">Look up</button></div>',
+    (el, close) => {
+      const go = () => { const v = el.querySelector('#tCode').value.replace(/\D/g,''); if (v.length < 6) return toast('That looks too short');
+        bg._onClose = null; close(); handleCode(v).finally(() => pauseScan(false)); };
+      el.querySelector('[data-a=ok]').onclick = go; el.querySelector('[data-a=no]').onclick = close;
+      el.querySelector('#tCode').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+      setTimeout(() => el.querySelector('#tCode').focus(), 60);
+    });
+  bg._onClose = () => pauseScan(false);
+}
+
+async function editTrolleyPrice(id){
+  const storeId = cur(); const it = (S.trolleys[storeId]||[]).find(i => i.id === id); if (!it) return;
+  const r = await priceSheet({ title: 'Edit price', name: it.name, image: it.image, barcode: it.barcode, price: it.price, askName: true, showSave: true });
+  if (!r) return;
+  it.price = r.price; it.name = r.name;
+  if (r.save) Core.setPrice(S, storeId, it.key, r.name, r.price, it.image);
+  persist(); render(); toast(r.save ? 'Price updated & saved' : 'Price updated for this trip');
+}
+
+/* ---- rendering ---- */
+function render(){
+  const storeId = cur(); const st = storeId && Core.storeById(S, storeId);
+  $('#storeName').textContent = st ? st.name : 'Choose store';
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  ['trolley','prices','settings'].forEach(t => $('#tab-'+t).classList.toggle('hidden', t !== tab));
+  $('#bar').classList.toggle('hidden', tab !== 'trolley');
+  if (tab === 'trolley') renderTrolley(storeId, st);
+  if (tab === 'prices') renderPrices();
+  if (tab === 'settings') renderSettings();
+  const t = storeId ? Core.totals(S, storeId) : { total:0, count:0 };
+  $('#totAmt').textContent = Core.fmt(t.total); $('#scTot').textContent = Core.fmt(t.total);
+  const cl = t.count + (t.count === 1 ? ' item' : ' items');
+  $('#countLbl').textContent = cl; $('#scCount').textContent = cl;
+  const bs = storeId ? Core.budgetStatus(S, storeId) : null; const bm = $('#budgetMsg');
+  $('#totRow').classList.toggle('over', !!(bs && bs.level === 'over'));
+  if (bs) { bm.className = 'budgetMsg ' + bs.level;
+    bm.textContent = bs.level === 'over' ? '⚠️ ' + Core.fmt(-bs.left) + ' over your ' + Core.fmt(bs.budget) + ' budget' : Core.fmt(bs.left) + ' left of ' + Core.fmt(bs.budget) + ' budget';
+  } else bm.className = 'budgetMsg hidden';
+}
+function renderTrolley(storeId, st){
+  const el = $('#tab-trolley');
+  if (!st) { el.innerHTML = '<div class="empty"><b>Pick your store to start</b>Prices are remembered separately for each store.<br><br><button class="btn pri" id="pickNow">Choose store</button></div>';
+    $('#pickNow').onclick = () => storePicker(); return; }
+  const t = S.trolleys[storeId] || [];
+  const budget = S.budgets[storeId];
+  let h = '<div class="tools"><button class="btn" id="budgetBtn">💰 '+(budget ? 'Budget '+Core.fmt(budget) : 'Set budget')+'</button>'+(t.length?'<button class="btn dang" id="clearBtn">🗑 Clear trolley</button>':'')+'</div>';
+  if (!t.length) h += '<div class="empty"><b>Trolley is empty</b>Tap <b style="display:inline;font-size:inherit">📷 Scan</b> and point the camera at a barcode. The first time you scan something at '+esc(st.name)+' you type the shelf price; after that it fills in automatically.</div>';
+  h += t.map(i => '<div class="card"><div class="item">'+(i.image?'<img src="'+esc(i.image)+'" alt="" loading="lazy">':'<div class="ph">'+(i.barcode?'📦':'🏷️')+'</div>')+
+    '<div class="info"><div class="nm">'+esc(i.name)+'</div><button class="unit" data-edit="'+i.id+'">'+Core.fmt(i.price)+' each ✎</button></div></div>'+
+    '<div class="row2"><div class="qty"><button data-dec="'+i.id+'" aria-label="Less">−</button><span>'+i.qty+'</span><button data-inc="'+i.id+'" aria-label="More">+</button></div>'+
+    '<div class="line">'+Core.fmt(i.price*i.qty)+'</div><button class="rm" data-rm="'+i.id+'" aria-label="Remove">✕</button></div></div>').join('');
+  h += '<small class="note">Shelf prices in Australia include GST, so this total is what you should pay (before any member or card discounts).</small>';
+  el.innerHTML = h;
+  el.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => { const it = t.find(x => x.id === b.dataset.inc); Core.setQty(S, storeId, it.id, it.qty + 1); persist(); render(); });
+  el.querySelectorAll('[data-dec]').forEach(b => b.onclick = async () => { const it = t.find(x => x.id === b.dataset.dec);
+    if (it.qty === 1 && !(await confirmSheet('Remove item?', it.name, 'Remove', true))) return;
+    Core.setQty(S, storeId, it.id, it.qty - 1); persist(); render(); });
+  el.querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => { const it = t.find(x => x.id === b.dataset.rm);
+    if (await confirmSheet('Remove item?', it.name, 'Remove', true)) { Core.removeItem(S, storeId, it.id); persist(); render(); } });
+  el.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editTrolleyPrice(b.dataset.edit));
+  const cb = $('#clearBtn'); if (cb) cb.onclick = async () => { if (await confirmSheet('Clear trolley?', 'Removes all '+t.length+' lines from your '+st.name+' trolley. Saved prices are kept.', 'Clear', true)) { Core.clearTrolley(S, storeId); persist(); render(); toast('Trolley cleared'); } };
+  $('#budgetBtn').onclick = () => {
+    sheet('<h2>Budget for '+esc(st.name)+'</h2><p class="muted">You\'ll get a warning when your trolley goes over. Leave blank for no budget.</p><input class="t price" id="bIn" inputmode="decimal" placeholder="$0.00" value="'+(budget?(budget/100).toFixed(2):'')+'"><div class="acts"><button class="btn" data-a="no">Cancel</button><button class="btn pri" data-a="ok">Save</button></div>',
+      (el2, close) => { el2.querySelector('[data-a=no]').onclick = close;
+        el2.querySelector('[data-a=ok]').onclick = () => { const v = el2.querySelector('#bIn').value.trim(); const c = Core.parsePrice(v);
+          if (v && c == null) return toast('Enter an amount like 150'); if (c) S.budgets[storeId] = c; else delete S.budgets[storeId]; persist(); close(); render(); };
+        setTimeout(() => el2.querySelector('#bIn').focus(), 60); });
+  };
+}
+function renderPrices(){
+  const el = $('#tab-prices');
+  if (!pbStore || !Core.storeById(S, pbStore)) pbStore = cur() || Core.stores(S)[0].id;
+  const opts = Core.stores(S).map(s => '<option value="'+esc(s.id)+'"'+(s.id===pbStore?' selected':'')+'>'+esc(s.name)+' ('+Object.keys(S.priceBook[s.id]||{}).length+')</option>').join('');
+  const entries = Object.entries(S.priceBook[pbStore]||{}).filter(([k,v]) => !pbQuery || (v.name+' '+k).toLowerCase().includes(pbQuery.toLowerCase()))
+    .sort((a,b) => a[1].name.localeCompare(b[1].name));
+  el.innerHTML = '<div class="card"><label class="f" style="margin-top:0">Store</label><select class="t" id="pbSel">'+opts+'</select>'+
+    '<label class="f">Search</label><input class="t" id="pbQ" placeholder="Name or barcode" value="'+esc(pbQuery)+'" autocomplete="off"></div>'+
+    '<div class="pb">'+(entries.length ? entries.map(([k,v]) => '<div class="card" data-k="'+esc(k)+'"><div class="item">'+(v.image?'<img src="'+esc(v.image)+'" alt="" loading="lazy">':'<div class="ph">'+(k.startsWith('nb:')?'🏷️':'📦')+'</div>')+
+      '<div class="info"><div class="nm">'+esc(v.name)+'</div><div class="sub">'+(k.startsWith('nb:')?'No barcode':esc(k))+' · updated '+esc(v.updated||'?')+'</div></div><div class="line">'+Core.fmt(v.price)+'</div></div></div>').join('')
+      : '<div class="empty"><b>No saved prices'+(pbQuery?' match':'')+'</b>Prices you enter while scanning are saved here.</div>')+'</div>';
+  $('#pbSel').onchange = e => { pbStore = e.target.value; renderPrices(); };
+  $('#pbQ').oninput = e => { pbQuery = e.target.value; const pos = e.target.selectionStart; renderPrices(); const q = $('#pbQ'); q.focus(); q.setSelectionRange(pos,pos); };
+  el.querySelectorAll('.pb .card[data-k]').forEach(c => c.onclick = () => editBookEntry(pbStore, c.dataset.k));
+}
+function editBookEntry(storeId, key){
+  const v = S.priceBook[storeId][key];
+  sheet('<h2>Saved price</h2><div class="muted">'+esc(Core.storeById(S,storeId).name)+' · '+(key.startsWith('nb:')?'no barcode':'barcode '+esc(key))+'</div>'+
+    '<label class="f">Name</label><input class="t" id="eName" value="'+esc(v.name)+'" autocomplete="off">'+
+    '<label class="f">Price (GST incl.)</label><input class="t price" id="ePrice" inputmode="decimal" value="'+(v.price/100).toFixed(2)+'" autocomplete="off">'+
+    '<div class="acts"><button class="btn dang" data-a="del">Delete</button><button class="btn" data-a="no">Cancel</button><button class="btn pri" data-a="ok">Save</button></div>',
+    (el, close) => {
+      el.querySelector('[data-a=no]').onclick = close;
+      el.querySelector('[data-a=del]').onclick = async () => { close(); if (await confirmSheet('Delete saved price?', v.name, 'Delete', true)) { Core.deletePrice(S, storeId, key); persist(); render(); } };
+      el.querySelector('[data-a=ok]').onclick = () => { const c = Core.parsePrice(el.querySelector('#ePrice').value), nm = el.querySelector('#eName').value.trim();
+        if (c == null || !nm) return toast('Enter a name and price');
+        Core.setPrice(S, storeId, key, nm, c, v.image);
+        (S.trolleys[storeId]||[]).forEach(i => { if (i.key === key) { i.price = c; i.name = nm; } });
+        persist(); close(); render(); toast('Saved'); };
+    });
+}
+function renderSettings(){
+  const el = $('#tab-settings');
+  const nPrices = Object.values(S.priceBook).reduce((s,b) => s + Object.keys(b).length, 0);
+  el.innerHTML = '<div class="card"><h3 style="margin:0 0 6px">Back up your prices</h3><p class="muted" style="margin:0 0 10px">Everything is stored on this phone only ('+nPrices+' saved prices). Export a backup now and then so it isn\'t lost if the browser data is cleared, or to move it to another phone.</p>'+
+    '<div class="tools"><button class="btn pri" id="expBtn">⬇️ Export backup</button><button class="btn" id="impBtn">⬆️ Import backup</button></div></div>'+
+    '<div class="card"><h3 style="margin:0 0 6px">Custom stores</h3>'+(S.customStores.length ? S.customStores.map(s => '<div style="display:flex;align-items:center;justify-content:space-between;min-height:48px"><span>'+esc(s.name)+'</span><button class="btn dang" data-del="'+esc(s.id)+'">Remove</button></div>').join('') : '<p class="muted">None yet. Add one from the store picker.</p>')+'</div>'+
+    '<div class="card"><h3 style="margin:0 0 6px">Tips</h3><ul class="muted" style="margin:0;padding-left:18px">'+
+    '<li>Add to your home screen: iPhone Safari → Share → Add to Home Screen. Android Chrome → ⋮ → Add to Home screen.</li>'+
+    '<li>Allow camera access when asked. If you said no, re-enable it in your browser\'s site settings.</li>'+
+    '<li>Product names come from Open Food Facts. If a product isn\'t found, just type the name once.</li>'+
+    '<li>Tap a price in the trolley to fix it if the shelf price has changed.</li>'+
+    '<li>📸 Snap price tag reads the price from a photo of the shelf ticket. Hold the phone straight-on and fill the photo with the ticket, then always check the number before adding.</li></ul></div>';
+  $('#expBtn').onclick = exportBackup;
+  $('#impBtn').onclick = () => $('#importFile').click();
+  el.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { const s = Core.storeById(S, b.dataset.del);
+    if (await confirmSheet('Remove '+s.name+'?', 'Its saved prices and trolley will be deleted.', 'Remove', true)) { Core.removeStore(S, s.id); persist(); render(); } });
+}
+async function exportBackup(){
+  const text = Core.exportData(S); const name = 'trolley-backup-' + Core.today() + '.json';
+  const file = new File([text], name, { type: 'application/json' });
+  try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Trolley backup' }); return; } } catch(e){ if (e && e.name === 'AbortError') return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('Backup downloaded');
+}
+$('#importFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const text = await f.text();
+  sheet('<h2>Import backup</h2><p class="muted">Merge keeps your current data and adds/updates prices from the file (newest wins). Replace wipes this phone\'s data first.</p><div class="acts"><button class="btn" data-a="no">Cancel</button><button class="btn dang" data-a="rep">Replace</button><button class="btn pri" data-a="mrg">Merge</button></div>',
+    (el, close) => {
+      el.querySelector('[data-a=no]').onclick = close;
+      const run = mode => { try { Core.importData(S, text, mode); persist(); close(); render(); toast('Backup imported'); } catch(err) { close(); toast('Import failed: ' + err.message, 3500); } };
+      el.querySelector('[data-a=rep]').onclick = () => run('replace'); el.querySelector('[data-a=mrg]').onclick = () => run('merge');
+    });
+};
+
+/* ================= Scanner ================= */
+let stream = null, detector = null, scanning = false, paused = false, lastCode = '', lastTime = 0, candidate = '', candCount = 0, loopTimer = null;
+const FORMATS = ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf'];
+function setScanMsg(h){ $('#scMsg').innerHTML = h; }
+async function getDetector(){
+  if (detector) return detector;
+  let BD = window.BarcodeDetector, fmts = FORMATS;
+  try { if (BD) { const sup = await BD.getSupportedFormats(); fmts = FORMATS.filter(f => sup.includes(f)); if (!fmts.includes('ean_13')) BD = null; } } catch(e){ BD = null; }
+  if (!BD) {
+    setScanMsg('<span class="spin"></span> Loading scanner…');
+    let mod = null;
+    for (const u of ['https://cdn.jsdelivr.net/npm/barcode-detector@3.2.4/dist/es/ponyfill.js', 'https://unpkg.com/barcode-detector@3.2.4/dist/es/ponyfill.js']) {
+      try { mod = await import(u); break; } catch(e){}
+    }
+    if (!mod) throw new Error('scanner library failed to load');
+    // load the decoder (WebAssembly), trying a couple of CDNs
+    let ready = false;
+    for (const cdn of ['https://cdn.jsdelivr.net/npm', 'https://unpkg.com', 'https://fastly.jsdelivr.net/npm']) {
+      try {
+        mod.purgeZXingModule();
+        await mod.prepareZXingModule({ fireImmediately: true, overrides: { locateFile: (p, pre) => { const m = p.match(/_(.+?)\.wasm$/); return m ? cdn + '/zxing-wasm@' + mod.ZXING_WASM_VERSION + '/dist/' + m[1] + '/' + p : pre + p; } } });
+        ready = true; break;
+      } catch(e){}
+    }
+    if (!ready) throw new Error('decoder failed to load');
+    BD = mod.BarcodeDetector; fmts = FORMATS;
+  }
+  detector = new BD({ formats: fmts });
+  return detector;
+}
+async function openScanner(){
+  unlockAudio();
+  const storeId = await ensureStore(); if (!storeId) return;
+  $('#scanner').classList.remove('hidden'); $('#lastAdded').classList.add('hidden');
+  render();
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { setScanMsg('Camera not available here (needs HTTPS). Use “Type code”.'); return; }
+  setScanMsg('<span class="spin"></span> Starting camera…');
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
+  } catch(e) {
+    setScanMsg(e && e.name === 'NotAllowedError' ? 'Camera permission was blocked. Allow camera for this site in your browser settings, or tap “Type code”.' : 'Couldn\'t start the camera (' + esc(e && e.message || e) + '). Tap “Type code”.');
+    return;
+  }
+  const v = $('#video'); v.srcObject = stream; try { await v.play(); } catch(e){}
+  try { const tr = stream.getVideoTracks()[0]; const caps = tr.getCapabilities ? tr.getCapabilities() : {};
+    if (caps.torch) $('#torchBtn').classList.remove('hidden');
+    if (caps.focusMode && caps.focusMode.includes('continuous')) tr.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(()=>{});
+  } catch(e){}
+  try { await getDetector(); } catch(e) { setScanMsg('Scanner failed to load (no internet?). Tap “Type code”.'); return; }
+  setScanMsg('Line up the barcode in the box');
+  scanning = true; paused = false; loop();
+}
+async function loop(){
+  if (!scanning) return;
+  const v = $('#video');
+  if (!paused && !busy && v.readyState >= 2 && !document.querySelector('.sheetBg')) {
+    try {
+      const res = await detector.detect(v);
+      const hit = res.find(r => /^\d+$/.test(r.rawValue) && (Core.isValidScan(r.rawValue) || r.format === 'upc_e')) || null;
+      if (hit) {
+        const code = hit.rawValue;
+        // require two consecutive matching reads to avoid misreads
+        if (code === candidate) candCount++; else { candidate = code; candCount = 1; }
+        const now = Date.now();
+        if (candCount >= 2 && !(code === lastCode && now - lastTime < 2500)) {
+          lastCode = code; lastTime = now; candidate = ''; candCount = 0;
+          beep(true); $('#reticle').classList.add('hit'); setTimeout(() => $('#reticle').classList.remove('hit'), 400);
+          await handleCode(code, hit.format);
+          lastTime = Date.now();
+        }
+      }
+    } catch(e){ if (!loop.warned) { loop.warned = true; setScanMsg('Scanner error: ' + esc(e.message || e) + '. Tap “Type code”.'); } }
+  }
+  loopTimer = setTimeout(loop, 120);
+}
+function pauseScan(p){ paused = p; }
+function suspendCamera(){ if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
+async function resumeCamera(){
+  if ($('#scanner').classList.contains('hidden') || stream) return;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
+    const v = $('#video'); v.srcObject = stream; await v.play().catch(()=>{}); } catch(e) { setScanMsg('Camera stopped. Tap Done and Scan again.'); }
+}
+function closeScanner(){
+  scanning = false; clearTimeout(loopTimer);
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  $('#video').srcObject = null; $('#torchBtn').classList.add('hidden');
+  $('#scanner').classList.add('hidden'); tab = 'trolley'; render();
+}
+let lastTimer = null;
+function showLast(it, auto){
+  const msg = (auto ? '✓ ' : '＋ ') + it.name + ' · ' + Core.fmt(it.price) + (it.qty > 1 ? ' (×' + it.qty + ')' : '');
+  if ($('#scanner').classList.contains('hidden')) { toast(msg); return; }
+  const el = $('#lastAdded'); el.innerHTML = '<span>' + esc(msg) + '</span><button class="unit" style="color:var(--g)" id="lastEdit">Edit</button>';
+  el.classList.remove('hidden'); $('#lastEdit').onclick = () => editTrolleyPrice(it.id);
+  clearTimeout(lastTimer); lastTimer = setTimeout(() => el.classList.add('hidden'), 6000);
+}
+let torchOn = false;
+$('#torchBtn').onclick = async () => { try { torchOn = !torchOn; await stream.getVideoTracks()[0].applyConstraints({ advanced: [{ torch: torchOn }] }); } catch(e){ toast('Light not supported'); } };
+$('#scanBtn').onclick = openScanner;
+$('#manualBtn').onclick = () => manualItem();
+$('#snapBtn').onclick = () => manualItem({ snap: true });
+$('#scClose').onclick = closeScanner; $('#scDone').onclick = closeScanner;
+$('#scType').onclick = typeCode;
+$('#scNoCode').onclick = () => { pauseScan(true); manualItem().then(() => { const w = setInterval(() => { if (!document.querySelector('.sheetBg')) { clearInterval(w); pauseScan(false); } }, 300); }); };
+$('#storeBtn').onclick = () => storePicker();
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0,0); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && scanning) closeScanner(); });
+
+/* ---- manifest for "Add to Home screen" ---- */
+try {
+  const icon = document.querySelector('link[rel=apple-touch-icon]').href;
+  const base = location.href.split('#')[0].split('?')[0];
+  const m = { name: 'Trolley Scanner', short_name: 'Trolley', start_url: base, scope: base.replace(/[^/]*$/, ''), display: 'standalone',
+    background_color: '#f4f6f5', theme_color: '#16803c', icons: [{ src: icon, sizes: '180x180', type: 'image/png' }] };
+  $('#manifestLink').href = URL.createObjectURL(new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }));
+} catch(e){}
+
+window.TrolleyApp = { Core, Lookup, get state(){ return S; }, handleCode, render };
+render();
+if (!cur()) storePicker(true);
+</script>
+</body>
+</html>
